@@ -6,10 +6,11 @@ from lseg.data.content.historical_pricing import summaries
 
 
 
-# Open the session
+# Open the session. This few lines could be removed in later commits as session could be opened separately by user even though it's a prerequisite
+
 session = ld.open_session(
     name="platform.ldp",
-    config_name="C:\\Users\\PreslavVachev\\Desktop\\EmLyon1Sem\\PythonNotebooks\\PythonBasics\\envBasics\\RandomExercises\\lseg-data.config.json"
+    config_name="" #here you need to enter the file path where the config.json config script is 
 )
 
 
@@ -25,13 +26,12 @@ definition = summaries.Definition(
     fields=["TRDPRC_1"]
 )
 
-# Retrieve data
+
 data = definition.get_data()
 
-extracted_data = data._data_raw  # List of dictionaries
+extracted_data = data._data_raw  
 
 
-# Transform into a DataFrame
 df_list = []
 for entry in extracted_data:
     df = pd.DataFrame(entry['data'], columns=['Date', entry['universe']['ric']])
@@ -42,17 +42,17 @@ df_final = df_list[0]
 for df in df_list[1:]:
     df_final = df_final.merge(df, on='Date', how='outer')
 
-# Convert 'Date' column to datetime
+
 df_final['Date'] = pd.to_datetime(df_final['Date'])
 
-# Sort by date
+
 df_final = df_final.sort_values('Date').reset_index(drop=True)
 
 spx_data = df_final[["Date", ".SPX"]].copy()
 
 ndx_data = df_final[["Date", ".NDX"]].copy()
 
-# print(df_final.head())
+
 
 print(spx_data, "\n", ndx_data) 
 
